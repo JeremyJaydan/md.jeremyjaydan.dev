@@ -1,0 +1,46 @@
+
+/* Editor Styles */
+.cm-s-jcdn{
+  --default: #cacaca;
+  --bg: #1e1e1e;
+  --bg-contrast: #282828;
+  --bg-lighter: #3a3a3a;
+  --blue: #569cd6;
+  --life: #424242;
+  --light-blue: #9cdcfe;
+  --blue-select: #264f78;
+  --tag-bracket: #9f3918;
+  --light-green: #a1c4a2;
+  --comment: #9c9c9c;
+  --variable: #bbd9f9;
+  --property: #b2bbff;
+  background: var(--bg);
+  height: 100%;
+  width: 100%;
+  font-size: 18px;
+  color: var(--default);
+}
+
+.cm-s-jcdn .cm-header{color: var(--blue)}
+.cm-s-jcdn .cm-tag{color: var(--blue)}
+.cm-s-jcdn .cm-bracket{color: var(--tag-bracket)}
+.cm-s-jcdn .cm-comment{color: var(--comment)}
+.cm-s-jcdn .cm-keyword{color: var(--blue)}
+.cm-s-jcdn .cm-def{color: var(--light-blue)}
+.cm-s-jcdn .cm-number{color: var(--light-green)}
+.cm-s-jcdn .cm-variable{color: var(--variable)}
+.cm-s-jcdn .cm-property{color: var(--property)}
+
+.cm-s-jcdn .CodeMirror-cursor{ border-left: 2px solid var(--default) }
+.cm-s-jcdn .CodeMirror-activeline-background{ border: 2px solid var(--bg-contrast)}
+.cm-s-jcdn .CodeMirror-selected{background: var(--blue-select)}
+.cm-s-jcdn .CodeMirror-gutters{
+  background: var(--bg);
+  border: none;
+  padding: 0 12px 0 4px;
+}
+.cm-s-jcdn .CodeMirror-overlayscroll-vertical div, .cm-s-jcdn .CodeMirror-overlayscroll-horizontal div{
+  background: var(--life);
+  border-radius: 0;
+}
+.cm-s-jcdn .CodeMirror-scrollbar-filler{background: var(--bg)}
