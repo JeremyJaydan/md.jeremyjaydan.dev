@@ -83,7 +83,8 @@ window.addEventListener("DOMContentLoaded", function(){
         autofocus: true,
         lineNumbers: true,
         scrollbarStyle: "overlay",
-        pollInterval: 10000
+        pollInterval: 10000,
+        tabSize: 2
       });
       hljs.initHighlightingOnLoad();
       page.preview.update(page.codeEditor.getValue());
