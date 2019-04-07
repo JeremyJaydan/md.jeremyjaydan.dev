@@ -1,8 +1,9 @@
 
 # A Markdown Editor
 
+![](https://jcdn.io/md-preview.png)
+
 ## FAQ
-- What's jCDN? It's just a domain I like to put projects on that relate to sharing content
 - What tools does it use? Refer to 'What it uses' below
 
 ## How it works
@@ -24,5 +25,4 @@ You input markdown in the editor and it renders it in the preview (wow easy).
 
 
 This project was built with the wonderful [GitPod](https://gitpod.io) editor.
-
 
