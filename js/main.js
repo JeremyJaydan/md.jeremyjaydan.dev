@@ -18,13 +18,15 @@ window.addEventListener("DOMContentLoaded", function(){
     }),
     preview: {
       update(content){
-        if(window.markdownit){
-          IncrementalDOM.patch(
-            page.elements.previewBody,
-            page.markdown.renderToIncrementalDOM(content)
-          );
-        }else{
-          console.log("Can't update preview, markdown-it library not found..");
+        if(!this.isHidden){
+          if(window.markdownit){
+            IncrementalDOM.patch(
+              page.elements.previewBody,
+              page.markdown.renderToIncrementalDOM(content)
+            );
+          }else{
+            console.log("Can't update preview, markdown-it library not found..");
+          }
         }
       },
       observe(){
@@ -51,7 +53,12 @@ window.addEventListener("DOMContentLoaded", function(){
           subtree: true,
           characterData: true
         })
-      }
+      },
+      isHidden: false,
+      togglePreview(){
+        page.elements.preview.classList.toggle("md__preview--hide");
+        this.isHidden = !this.isHidden;
+      },
     },
     elements: $.queryMap({
       logo: ".page__logo",
@@ -93,6 +100,16 @@ window.addEventListener("DOMContentLoaded", function(){
       page.setStatus("Ready", 1000);
     }
   };
+
+  window.addEventListener("keydown", function(event){
+    if(event.code === "Escape"){
+      page.preview.togglePreview();
+    }
+  });
+
+  document.querySelector(".js--toggle-preview")
+    .addEventListener("click", page.preview.togglePreview)
+  ;
 
   page.init();
 
