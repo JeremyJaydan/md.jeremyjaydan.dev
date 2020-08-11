@@ -24,6 +24,9 @@ window.addEventListener("DOMContentLoaded", function(){
               page.elements.previewBody,
               page.markdown.renderToIncrementalDOM(content)
             );
+            if(page.stateful){
+              page.updateStorage();
+            }
           }else{
             console.log("Can't update preview, markdown-it library not found..");
           }
@@ -69,10 +72,10 @@ window.addEventListener("DOMContentLoaded", function(){
       previewBody: ".markdown-body"
     }),
     codeEditor: null,
-    setStatus(state, timeout = 0){
-      page.elements.status.innerText = state;
-      page.elements.logo.classList.add("anim--spin");
-      console.log({state});
+    setStatus(status, timeout = 0){
+      page.elements.status.innerText = status;
+      if(timeout && timeout > 0) page.elements.logo.classList.add("anim--spin");
+      console.log({status});
       if(timeout > 0) this.clearStatus(timeout);
     },
     clearStatus(timeout = 0){
@@ -97,7 +100,40 @@ window.addEventListener("DOMContentLoaded", function(){
       page.preview.update(page.codeEditor.getValue());
       page.codeEditor.on("changes", () => page.preview.update(page.codeEditor.getValue()));
       page.preview.observe();
+      page.stateful = page.getState();
+      if(page.stateful){
+        const content = page.getStatefulContent();
+        if(content && content !== null){
+          page.codeEditor.setValue(content);
+          setTimeout(function(){
+            page.setStatus("Stateful");
+          }, 1005);
+        }
+      }
       page.setStatus("Ready", 1000);
+    },
+    getState(){
+      return JSON.parse(localStorage.getItem("md.jcdn.io-state"));
+    },
+    getStatefulContent(){
+      return localStorage.getItem("md.jcdn.io-content");
+    },
+    stateful: false,
+    toggleState(){
+      page.stateful = !page.stateful;
+      page.updateState(page.stateful);
+      if(page.stateful){
+        page.setStatus("Stateful");
+      }else{
+        page.setStatus("Not Stateful", 3000);
+      }
+    },
+    updateState(state){
+      localStorage.setItem("md.jcdn.io-state", state);
+    },
+    updateStorage(){
+      const content = page.codeEditor.getValue();
+      localStorage.setItem("md.jcdn.io-content", content);
     }
   };
 
@@ -109,6 +145,10 @@ window.addEventListener("DOMContentLoaded", function(){
 
   document.querySelector(".js--toggle-preview")
     .addEventListener("click", page.preview.togglePreview)
+  ;
+
+  document.querySelector(".js--toggle-state")
+    .addEventListener("click", page.toggleState)
   ;
 
   page.init();
