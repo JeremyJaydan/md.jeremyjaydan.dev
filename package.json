@@ -1,0 +1,23 @@
+{
+  "name": "md.jeremyjaydan.dev",
+  "version": "1.0.0",
+  "description": "A fast markdown editor",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -w ./index.html --exec \"tailwindcss -c ./tailwind.config.js -o ./css/client.css && serve .\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeremyjaydan/md.jeremyjaydan.dev.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jeremyjaydan/md.jeremyjaydan.dev/issues"
+  },
+  "homepage": "https://github.com/jeremyjaydan/md.jeremyjaydan.dev#readme",
+  "dependencies": {
+    "nodemon": "^2.0.12",
+    "tailwindcss": "^2.2.10"
+  }
+}

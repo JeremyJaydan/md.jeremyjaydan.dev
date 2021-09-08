@@ -620,6 +620,7 @@
 }
 
 .markdown-body li {
+  list-style-type: initial;
   word-wrap: break-all;
 }
 

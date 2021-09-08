@@ -2,7 +2,7 @@
 /* Editor Styles */
 .cm-s-jcdn{
   --default: #cacaca;
-  --bg: #1e1e1e;
+  --bg: transparent;
   --bg-contrast: #282828;
   --bg-lighter: #3a3a3a;
   --blue: #569cd6;
@@ -35,9 +35,9 @@
 .cm-s-jcdn .CodeMirror-activeline-background{ border: 2px solid var(--bg-contrast)}
 .cm-s-jcdn .CodeMirror-selected{background: var(--blue-select)}
 .cm-s-jcdn .CodeMirror-gutters{
-  background: var(--bg);
+  background: #111827;
   border: none;
-  padding: 0 12px 0 4px;
+  padding: 0 6px 0 0;
 }
 .cm-s-jcdn .CodeMirror-overlayscroll-vertical div, .cm-s-jcdn .CodeMirror-overlayscroll-horizontal div{
   background: var(--life);

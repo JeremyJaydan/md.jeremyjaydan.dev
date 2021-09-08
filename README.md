@@ -1,28 +1,23 @@
+# A Markdown Editor - built for speed
 
-# A Markdown Editor
+## Features
+- Documents are created and saved to localstorage if they have a H1 (one #), so to delete a document, simply remove the H1
+	- you can use it as a temporary editor by not specifying the h1
+- The preview auto scroll is determined by the caret in the editor which affects the caret in the preview
+- Press ESC to toggle the preview
 
-![](https://jcdn.io/md-preview.png)
-
-## FAQ
-- What tools does it use? Refer to 'What it uses' below
-
-## How it works
-Have you ever wondered what it would be like to preview your markdown as you're writing it?
-Do you want to play minesweeper?
-With this new advanced technology, you can do one of those things.
-
-You input markdown in the editor and it renders it in the preview (wow easy).
-
-## What it uses
+## Behind the scenes
+- [Alpine.js](https://alpinejs.dev/) (app logic, interactivity, state management)
+- [tailwindcss](https://tailwindcss.com/) (ui styling)
 - [CodeMirror](https://github.com/codemirror/CodeMirror) (editor)
-- [/css/editor.css](https://md.jcdn.io/css/editor.css) (custom CSS for editor - MIT)
-- [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) (CSS to style the rendered markdown)
-- [highlight.js](https://github.com/highlightjs/highlight.js) (Syntax highlighting for md codeblocks)
-- [markdown-it-task-lists](https://github.com/revin/markdown-it-task-lists) (for checkbox support)
 - [markdown-it](https://github.com/markdown-it/markdown-it) (Markdown parser)
-- [incremental-dom](https://github.com/google/incremental-dom) (for contextually fast performance)
+- [highlight.js](https://github.com/highlightjs/highlight.js) (Syntax highlighting for md codeblocks)
+- [incremental-dom](https://github.com/google/incremental-dom) (dom diffing)
 - [markdown-it-incremental-dom](https://github.com/yhatt/markdown-it-incremental-dom) (to integrate the above two together)
+- [markdown-it-task-lists](https://github.com/revin/markdown-it-task-lists) (for checkbox support)
+- [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) (CSS to style the rendered markdown)
+- [/css/editor.css](https://md.jeremyjaydan.dev/css/editor.css) (custom CSS for editor - MIT)
 
-
-This project was built with the wonderful [GitPod](https://gitpod.io) editor.
-
+## Links
+- [GitHub (md.jeremyjayan.dev)](https://github.com/jeremyjaydan/md.jeremyjaydan.dev)
+- [Twitter (@jeremyjaydan)](https://twitter.com/jeremyjaydan)

@@ -1,69 +1,401 @@
 <!DOCTYPE HTML>
-<html>
+<html
+  class="w-full h-full">
   <head>
-    <link rel="icon" href="/_md.png">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    
     <title>Markdown Editor</title>
+    
+    <link rel="icon" href="/_md.png">
     <link rel="stylesheet" type="text/css" href="/css/codemirror-tools.css">
     <link rel="stylesheet" type="text/css" href="/css/markdown.css">
-    <link rel="stylesheet" type="text/css" href="/css/master.css">
     <link rel="stylesheet" type="text/css" href="/css/editor.css">
+    <link rel="stylesheet" type="text/css" href="/css/client.css">
+    
+    <style>
+      
+      [data-preview-cursor]{
+        position: relative;
+        width: 0 !important;
+        height: 0 !important;
+        padding: 0 !important;
+      }
+      
+      [data-preview-cursor]::after{
+        position: absolute;
+        content: "";
+        width: 3px;
+        height: 100%;
+        background: #569cd6;
+        animation: 1s blink step-end infinite;
+        /*filter: invert(100%);*/
+      }
+      
+      @keyframes "blink" {
+        from, to {
+          opacity: 0;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      
+    </style>
+    
   </head>
-  <body>
-    <div class="md">
-      <div class="md__editor">
-        <div class="md__nav">
-          <ul class="nav">
-            <li class="nav__item page__logo">
-              <a class="nav__link" href="/" target="">
-              <img class="nav__icon" src="/jcdn-md.png"></a>
-            </li>
-            <li class="nav__item">
-              <span class="nav__text">Help</span>
-              <ul class="nav">
-                <li class="nav__item">
-                  <a class="nav__link" href="https://github.com/JeremyJaydan/md.jeremyjaydan.dev" target="_blank">
-                    <span class="nav__text">About<p class="nav__desc">(GitHub Repository)</p></span>
-                  </a>
-                </li>
-                <li class="nav__item">
-                  <a class="nav__link" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet" target="_blank">
-                    <span class="nav__text">Markdown Cheetsheet<p class="nav__desc">by Adam Pritchard</p></span>
-                  </a>
-                </li>
-                <li class="nav__item">
-                  <a class="nav__link" href="https://discord.gg/RBY2RyW" target="_blank">
-                    <span class="nav__text">Discord<p class="nav__desc">Albatross</p></span>
-                  </a>
-                </li>
-                <li class="nav__item">
-                  <a class="nav__link" href="https://twitter.com/JeremyJaydan" target="_blank">
-                    <span class="nav__text">Who made this?<p class="nav__desc">I did! (JeremyJaydan)</p></span>
-                  </a>
-                </li>
-                <li class="nav__item js--toggle-preview">
-                  <a class="nav__link">
-                    <span class="nav__text">Toggle Preview<p class="nav__desc">ESC</p></span>
-                  </a>
-                </li>
-                <li class="nav__item js--toggle-state">
-                  <a class="nav__link">
-                    <span class="nav__text">Toggle Statefulness<p class="nav__desc">(Local storage)</p></span>
-                  </a>
-                </li>
-              </ul>
-            </li>
-            <li class="nav__item page__status nav__item--right">Initializing</li>
-          </ul>
+  <body
+    class="w-full h-full"
+    x-data="app">
+    
+    <div
+      @keydown.escape.window="preview = !preview"
+      class="flex flex-col h-full w-full p-4 pt-0">
+      
+      <!--documents-->
+      <section
+        id="documents-nav"
+        class="flex w-full overflow-x-auto whitespace-nowrap box-border py-2 "
+        style="height: 56px">
+        <div
+          class="flex px-4 mr-2 inline-flex rounded-lg bg-gray-200 text-gray-700 font-medium cursor-pointer select-none hover:bg-gray-300"
+          @click="createNewDoc()">
+          <span
+            class="self-center">
+            +
+          </span>
         </div>
-        <div class="md__code"></div>
-      </div>
-      <div class="md__preview">
-        <div class="markdown-body"></div>
-      </div>
+        <div
+          class="flex gap-2">
+          <!-- document button -->
+          <template x-transition x-for="([ docId ]) in filteredDocuments" :key="docId">
+            <div
+              :class="{
+                '!bg-gray-900 !text-white': currentDocumentId === docId
+              }"
+              class="flex p-2 h-full cursor-pointer select-none self-center text-gray-800 font-medium rounded-lg hover:bg-gray-200"
+              x-data="{
+                selected: false,
+                get doc(){
+                  return documents[docId] || {};
+                }
+              }"
+              @click="(() => {
+                currentDocumentId = docId;
+                setEditorValue(documents[docId].content);
+                saveEnabled = false;
+                editor.setCursor({ line: 0, ch: editor.getLine(0).length });
+                editor.focus();
+                saveEnabled = true;
+                $nextTick(() => editor.refresh());
+              })">
+              <span
+                x-text="doc.title"
+                class="self-center">
+              </span>
+            </div>
+          </template>
+        </div>
+      </section>
+      
+      <section
+        style="height: calc(100% - 56px)"
+        class="w-full h-full flex flex-col md:flex-row flex-grow overflow-auto">
+        
+        <!--editor-->
+        <div
+          :class="{
+            '!w-full': !preview
+          }"
+          class="w-full h-1/2 md:w-1/2 md:h-full">
+          <!--toolbar-->
+          <nav></nav>
+          <!--codemirror-->
+          <div
+            class="p-2 bg-gray-900 h-full border-4 border-blue-500 rounded-xl"
+            id="editor" x-ignore>
+          </div>
+        </div>
+        
+        <!--preview-->
+        <main
+          x-show="preview"
+          id="preview"
+          class="w-full h-1/2 md:w-1/2 md:h-full p-4 overflow-auto">
+          <div x-ignore class="markdown-body"></div>
+        </main>
+        
+      </section>
+      
     </div>
-    <script type="text/javascript" src="/js/md-tools.js"></script>
-    <script type="text/javascript" src="/js/codemirror-tools.js"></script>
-    <script type="text/javascript" src="/js/utils.js"></script>
-    <script type="text/javascript" src="/js/main.js"></script>
+
+    <script>
+      
+      document.addEventListener('alpine:init', () => {
+        
+        Alpine.data('app', function(){
+          
+          return {
+          
+            saveEnabled: true,
+            currentDocumentId: this.$genStr(),
+            documents: this.$persist({}),
+            subHeadings: [],
+            
+            isNewUser: this.$persist(true),
+            preview: this.$persist(true),
+            
+            get documentList(){
+              return Object.entries(this.documents)
+                .sort(([, doc1], [, doc2]) => {
+                  return doc1.editedAt > doc2.editedAt ? -1 : 1;
+                });
+            },
+            
+            get filteredDocuments(){
+              return Object.entries(this.documents)
+                .sort(([, doc1], [, doc2]) => {
+                  return doc1.editedAt > doc2.editedAt ? -1 : 1;
+                });
+            },
+            
+            get currentDocument(){
+              return this.documents[this.currentDocumentId];
+            },
+            
+            setEditorValue(value){
+              this.saveEnabled = false;
+              editor.setValue(value);
+              this.saveEnabled = true;
+            },
+            
+            createNewDoc(content){
+              let docId = this.$genStr();
+              this.currentDocumentId = docId;
+              editor.setValue(content || '# New Document');
+              editor.setCursor({ line: 0, ch: editor.getLine(0).length });
+              editor.focus();
+              this.$nextTick(() => editor.refresh());
+              document.querySelector('#documents-nav').scroll({ top: 0, behavior: 'smooth' });
+            },
+            
+            init(){
+
+              let codeMirrorElement = document.querySelector('#editor');
+              let previewContainerElement = document.querySelector('#preview');
+              let markdownBodyElement = document.querySelector('.markdown-body');
+              
+              // setup codemirror
+              const editor = CodeMirror(codeMirrorElement, {
+                mode: { name: 'gfm' },
+                theme: 'jcdn',
+                autofocus: true,
+                lineNumbers: true,
+                scrollbarStyle: 'overlay',
+                pollInterval: 10000,
+                tabSize: 2
+              });
+              
+              window.editor = editor;
+              
+              const replaceCursorCharacter = str => {
+                return str.replace(cursorCharacter, cursorMarkup);
+              };
+              
+              const removeCursorMarkup = str => {
+                return str.replace(cursorMarkup, '');
+              };
+              
+              // setup markdownit
+              window.markdown = new markdownit({
+                highlight: function (str, lang) {
+                  str = str.replace(cursorMarkup, cursorCharacter);
+                  if (lang && hljs.getLanguage(lang)) {
+                    try {
+                      return replaceCursorCharacter(`<pre class='hljs'><code>${ hljs.highlight(lang, str, true).value }</code></pre>`);
+                    } catch (__) {}
+                  }
+                  return replaceCursorCharacter(`<pre class='hljs'><code>${ markdown.utils.escapeHtml(str) }</code></pre>`);
+                },
+                html: true,
+                linkify: true
+              });
+              
+              // use incremental dom for dope performance
+              markdown.use(markdownitIncrementalDOM, IncrementalDOM);
+              hljs.initHighlightingOnLoad();
+              
+              // support checkboxes
+              markdown.use(markdownitTaskLists);
+              
+              // watch for changes in the editor
+              let tokenMaps = [];
+              let cursorMarkup = `<i data-preview-cursor></i>`;
+              let cursorCharacter = '\u23A2';
+              const generate = () => {
+              
+                let content = editor.getValue();
+                
+                // inject cursor position inline to be rendered as an invisible cursor (to be used for scrolling)
+                let cursor = editor.getCursor();
+                
+                let contentWithCursor = content.split('\n')
+                  .map((line, index) => {
+                    // console.log({ line, cursorLine: cursor.line })
+                    if(index === cursor.line){
+                      let lineHalf1 = line.substring(0, cursor.ch);
+                      let lineHalf2 = line.substring(cursor.ch, line.length);
+                      return `${lineHalf1}${cursorMarkup}${lineHalf2}`;
+                    }else{
+                      return line;
+                    }
+                  })
+                  .join('\n');
+                
+                let tokens = markdown.parse(contentWithCursor, markdown.options);
+                let patch = markdown.IncrementalDOMRenderer.render(tokens, markdown.options);
+                
+                IncrementalDOM.patch(
+                  markdownBodyElement,
+                  patch
+                );
+                
+                // get headings
+                const titleHeadingElement = markdownBodyElement.querySelector('h1');
+                
+                // save the document if it has a title
+                if(this.saveEnabled){
+                  let title = titleHeadingElement && titleHeadingElement.innerText;
+                  if(title && title.replace(/\s/g, '').length > 0){
+                    
+                    content = removeCursorMarkup(content);
+                    
+                    this.documents[this.currentDocumentId] = {
+                      title,
+                      content,
+                      editedAt: Date.now()
+                    };
+                  }
+                  // otherwise delete the doument
+                  else{
+                    delete this.documents[this.currentDocumentId];
+                  }
+                }
+                
+              }
+              
+              editor.on('changes', generate);
+              editor.on('cursorActivity', generate);
+              
+              // handle events for multiple tabs
+              window.addEventListener('storage', event => {
+                if(event.key === '_x_documents'){
+                  
+                  let { oldValue, newValue } = event;
+                  
+                  if(oldValue === newValue) return;
+                  
+                  let oldDocuments = JSON.parse(oldValue);
+                  let newDocuments = JSON.parse(newValue);
+                  
+                  // update existing documents
+                  Object.entries(newDocuments)
+                    .forEach(([ docId, doc ]) => {
+                      this.documents[docId] = doc;
+                    });
+                  
+                  // remove deleted documents
+                  Object.entries(oldDocuments)
+                    .forEach(([ docId, doc ]) => {
+                      if(!newDocuments[docId]){
+                        delete this.documents[docId];
+                      }
+                    });
+                    
+                  // update the editor
+                  let currentDoc = this.documents[this.currentDocumentId];
+                  if(currentDoc){
+                    this.setEditorValue(currentDoc.content);
+                  }
+                  
+                }
+              });
+              
+              const matchPreviewElement = (event, eventType) => {
+                
+                // get the preview cursor element
+                let cursorPreviewElement = markdownBodyElement.querySelector('[data-preview-cursor]');
+                
+                if(cursorPreviewElement){
+                  
+                  // get editor cursor offset
+                  let editorCursorOffset = editor.cursorCoords().top;
+                  let previewCursorOffset = cursorPreviewElement.offsetTop;
+                  
+                  let offsetTop = previewCursorOffset - editorCursorOffset;
+                  
+                  previewContainerElement.scroll({
+                    top: offsetTop,
+                    left: 0,
+                    behavior: eventType === 'cursorActivity' ? 'smooth' : 'auto'
+                  })
+                  
+                }
+                
+              };
+              
+              editor.on('cursorActivity', e => matchPreviewElement(e, 'cursorActivity'));
+              editor.on('scroll', e => matchPreviewElement(e, 'scroll'));
+              
+              // add usage doc if new user
+              let usageScript = document.querySelector('#usage');
+              let usageContent = usageScript.innerText;
+              
+              if(this.isNewUser){
+                this.createNewDoc(usageContent);
+                this.isNewUser = false;
+              }
+              
+            }
+          
+          }
+          
+        })
+        
+      });
+      
+    </script>
+    
+    <script type="text/markdown" id="usage">
+# A Markdown Editor - built for speed
+
+## Features
+- Documents are created and saved to localstorage if they have a H1 (one #), so to delete a document, simply remove the H1
+	- you can use it as a temporary editor by not specifying the h1
+- The preview auto scroll is determined by the caret in the editor which affects the caret in the preview
+- Press ESC to toggle the preview
+
+## Behind the scenes
+- [Alpine.js](https://alpinejs.dev/) (app logic, interactivity, state management)
+- [tailwindcss](https://tailwindcss.com/) (ui styling)
+- [CodeMirror](https://github.com/codemirror/CodeMirror) (editor)
+- [markdown-it](https://github.com/markdown-it/markdown-it) (Markdown parser)
+- [highlight.js](https://github.com/highlightjs/highlight.js) (Syntax highlighting for md codeblocks)
+- [incremental-dom](https://github.com/google/incremental-dom) (dom diffing)
+- [markdown-it-incremental-dom](https://github.com/yhatt/markdown-it-incremental-dom) (to integrate the above two together)
+- [markdown-it-task-lists](https://github.com/revin/markdown-it-task-lists) (for checkbox support)
+- [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) (CSS to style the rendered markdown)
+- [/css/editor.css](https://md.jeremyjaydan.dev/css/editor.css) (custom CSS for editor - MIT)
+
+## Links
+- [GitHub (md.jeremyjayan.dev)](https://github.com/jeremyjaydan/md.jeremyjaydan.dev)
+- [Twitter (@jeremyjaydan)](https://twitter.com/jeremyjaydan)
+    </script>
+    
+    <script src="/js/md-tools.js"></script>
+    <script src="/js/codemirror-tools.js"></script>
+    <script src="/js/plugins.js"></script>
+    <script src="/js/alpine.persist.js"></script>
+    <script src="/js/alpine.js"></script>
   </body>
 </html>
