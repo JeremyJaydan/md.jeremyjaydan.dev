@@ -642,6 +642,10 @@ video {
   height: 50%;
 }
 
+.\!h-full {
+  height: 100% !important;
+}
+
 .w-full {
   width: 100%;
 }

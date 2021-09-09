@@ -49,7 +49,7 @@
     x-data="app">
     
     <div
-      @keydown.escape.window="preview = !preview"
+      @keydown.escape.window="cycleMode()"
       class="flex flex-col h-full w-full p-4 pt-0">
       
       <!--documents-->
@@ -105,11 +105,10 @@
         <!--editor-->
         <div
           :class="{
-            '!w-full': !preview
+            '!w-full h-full': mode === 'code'
           }"
+          x-show="mode === 'code' || mode === 'both'"
           class="w-full h-1/2 md:w-1/2 md:h-full">
-          <!--toolbar-->
-          <nav></nav>
           <!--codemirror-->
           <div
             class="p-2 bg-gray-900 h-full border-4 border-blue-500 rounded-xl"
@@ -119,8 +118,11 @@
         
         <!--preview-->
         <main
-          x-show="preview"
           id="preview"
+          x-show="mode === 'preview' || mode === 'both'"
+          :class="{
+            '!w-full !h-full': mode === 'preview'
+          }"
           class="w-full h-1/2 md:w-1/2 md:h-full p-4 overflow-auto">
           <div x-ignore class="markdown-body"></div>
         </main>
@@ -143,7 +145,26 @@
             subHeadings: [],
             
             isNewUser: this.$persist(true),
-            preview: this.$persist(true),
+            
+            mode: this.$persist('both'),
+            cycleMode(){
+              
+              if(this.mode === 'both'){
+                this.mode = 'code';
+                return;
+              }
+              
+              if(this.mode === 'code'){
+                this.mode = 'preview';
+                return;
+              }
+              
+              if(this.mode === 'preview'){
+                this.mode = 'both';
+                return;
+              }
+              
+            },
             
             get documentList(){
               return Object.entries(this.documents)
