@@ -107,6 +107,12 @@
           :class="{
             '!w-full h-full': mode === 'code'
           }"
+					@keydown="(() => {
+						if($event.key === 'z' && $event.altKey){
+							lineWrapping = !lineWrapping;
+							editor.setOption('lineWrapping', lineWrapping);
+						}
+					})"
           x-show="mode === 'code' || mode === 'both'"
           class="w-full h-1/2 md:w-1/2 md:h-full">
           <!--codemirror-->
@@ -199,6 +205,8 @@
               this.$nextTick(() => editor.refresh());
               document.querySelector('#documents-nav').scroll({ top: 0, behavior: 'smooth' });
             },
+						
+						lineWrapping: this.$persist(false),
             
             init(){
 
@@ -214,7 +222,8 @@
                 lineNumbers: true,
                 scrollbarStyle: 'overlay',
                 pollInterval: 10000,
-                tabSize: 2
+                tabSize: 2,
+								lineWrapping: this.lineWrapping
               });
               
               window.editor = editor;
@@ -394,7 +403,8 @@
 - Documents are created and saved to localstorage if they have a H1 (one #), so to delete a document, simply remove the H1
 	- you can use it as a temporary editor by not specifying the h1
 - The preview auto scroll is determined by the caret in the editor which affects the caret in the preview
-- Press ESC to toggle the preview
+- Press `ESC` to toggle the preview
+- Press `ALT` + `Z` to toggle line wrapping
 
 ## Behind the scenes
 - [Alpine.js](https://alpinejs.dev/) (app logic, interactivity, state management)
